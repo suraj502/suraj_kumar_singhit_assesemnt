@@ -8,44 +8,195 @@ I would test the main user journeys first: registering, logging in, and managing
 
 ## Test Cases
 
-| Test Case ID | Scenario | Steps / Test Data | Expected Result | Type |
-|---|---|---|---|---|
-| REG-01 | Register with valid data | Enter a new valid name, email, password, and confirmation if available. Submit. | Account is created and the user receives a clear success message or is taken to login. | Positive |
-| REG-02 | Required registration fields are empty | Submit the form with all fields empty. | The form is not submitted. Each required field shows a useful validation message. | Negative |
-| REG-03 | One required field is missing | Leave one required field empty and complete the others. | Registration is blocked and the missing field is identified. | Negative |
-| REG-04 | Invalid email format | Use values such as `user`, `user@`, or `user.example.com`. | Registration is blocked with an email format message. | Negative |
-| REG-05 | Weak password | Use a password that does not meet the documented rules. | Registration is blocked and the password requirements are explained. If no rules exist, this requirement should be clarified. | Negative |
-| REG-06 | Password confirmation does not match | Enter different values in the password and confirmation fields. | Registration is blocked and the mismatch is clearly shown. | Negative |
-| REG-07 | Existing email address | Register using an email already linked to an account. | A second account is not created. A clear message explains that the email is already registered. | Negative |
-| REG-08 | Leading and trailing spaces | Add spaces before and after the name and email. | The application handles spaces consistently, preferably trimming harmless spaces or showing a clear validation message. | Edge |
-| REG-09 | Very long registration input | Enter values near and above the allowed maximum length. | Allowed values are accepted. Overly long values are rejected without breaking the page or database. | Edge |
-| REG-10 | Special characters in registration fields | Use valid characters in the name and password, including punctuation where allowed. | Valid characters are handled correctly. Invalid characters are rejected with a clear message. | Edge |
-| LOG-01 | Login with valid credentials | Enter a registered email and correct password. | Login succeeds and the user can access the task list. | Positive |
-| LOG-02 | Wrong password | Enter a registered email with an incorrect password. | Login fails and a clear, non-sensitive error is shown. | Negative |
-| LOG-03 | Unregistered email | Enter an email that has no account. | Login fails. The message must not expose unnecessary account details. | Negative |
-| LOG-04 | Empty login fields | Submit the login form with both fields empty. | Login is blocked and required-field messages are displayed. | Negative |
-| LOG-05 | Invalid login email format | Enter an invalid email format with any password. | The email is rejected before login is attempted, or a suitable validation message is shown. | Negative |
-| LOG-06 | Email case and spaces | Try the registered email with different letter casing and with accidental spaces. | Behavior follows the defined email rules consistently. A valid email should not fail only because of harmless formatting differences unless documented. | Edge |
-| LOG-07 | Multiple failed login attempts | Submit several incorrect passwords for the same account. | The application applies its defined protection, such as rate limiting, temporary lockout, or an appropriate warning. Passwords are not revealed. | Security |
-| LOG-08 | Logout and protected page access | Log in, log out, then try to open the task page using the previous URL or browser Back button. | The user cannot access protected task data and is sent to login. | Negative |
-| TASK-01 | Create a valid task | Log in and enter valid task data. Submit it. | The task is created once and appears in the user's task list. | Positive |
-| TASK-02 | Create a task with empty required data | Leave required task data empty and submit. | The task is not created and the missing data is identified. | Negative |
-| TASK-03 | Create a task with very long data | Enter task data near and above the allowed length. | Valid maximum-length data is handled. Excessively long input is rejected safely. | Edge |
-| TASK-04 | Create a task with special characters | Use punctuation, line breaks, and other allowed special characters. | The task is stored and displayed correctly without corrupting the page or being treated as executable content. | Edge |
-| TASK-05 | View tasks after login | Log in as a user who has existing tasks. | The task list loads and shows the correct tasks. Empty-list behavior is also clear for a user with no tasks. | Positive |
-| TASK-06 | Edit an existing task | Open a task, change its data, and save. | The updated task appears in the list with the new values. | Positive |
-| TASK-07 | Edit with empty or invalid data | Remove required task data or enter an invalid value, then save. | The update is blocked and the original task data is not lost. | Negative |
-| TASK-08 | Delete an existing task | Delete a task and confirm if a confirmation step exists. | The selected task is removed and other tasks remain unchanged. | Positive |
-| TASK-09 | Cancel deletion | Start deleting a task and cancel the confirmation if available. | The task remains in the list unchanged. | Negative |
-| TASK-10 | Edit only the selected task | Open one task and verify that editing changes only that task. | No other task is changed. | Edge |
-| TASK-11 | Verify persistence after refresh | Create or edit a task, refresh the page, and view the list again. | The saved change remains visible. | Positive |
-| TASK-12 | Verify persistence after re-login | Create or edit a task, log out, and log in again. | The task and its latest changes are still present. | Positive |
-| TASK-13 | Verify task ownership | Create tasks for User A. Log in as User B and view, edit, or delete tasks. | User B cannot see or change User A's tasks. | Security |
-| TASK-14 | Duplicate task submission | Submit the create action repeatedly, including by double-clicking if possible. | Only the intended number of tasks is created. Accidental duplicate records are avoided or clearly handled. | Edge |
-| ERR-01 | Server or database failure during create | Simulate a test-environment failure while saving a task. | A clear error is shown. The user is told whether the task was saved, and no misleading success message is displayed. | Error handling |
-| ERR-02 | Server or database failure during edit/delete | Simulate a failure while updating or deleting a task. | The user receives a useful error. Existing data is not incorrectly shown as changed or deleted. | Error handling |
-| ERR-03 | Unexpected technical error | Cause or simulate an invalid request or unavailable service. | The application shows a friendly error without stack traces, SQL statements, file paths, or other sensitive technical information. | Error handling |
-| ERR-04 | Repeated form submission after an error | Submit invalid data, correct it, and submit again. | Old error messages do not remain incorrectly, and the corrected request is processed normally. | Edge |
+The cases below are grouped by feature so they are easier to read than one wide table.
+
+### Registration
+
+**REG-01 - Register with valid data**  
+Steps / Test data: Enter a new valid name, email, password, and confirmation if available. Submit.  
+Expected result: The account is created and the user receives a clear success message or is taken to login.  
+Type: Positive
+
+**REG-02 - Required registration fields are empty**  
+Steps / Test data: Submit the form with all fields empty.  
+Expected result: The form is not submitted. Each required field shows a useful validation message.  
+Type: Negative
+
+**REG-03 - One required field is missing**  
+Steps / Test data: Leave one required field empty and complete the others.  
+Expected result: Registration is blocked and the missing field is identified.  
+Type: Negative
+
+**REG-04 - Invalid email format**  
+Steps / Test data: Use values such as `user`, `user@`, or `user.example.com`.  
+Expected result: Registration is blocked with an email format message.  
+Type: Negative
+
+**REG-05 - Weak password**  
+Steps / Test data: Use a password that does not meet the documented rules.  
+Expected result: Registration is blocked and the password requirements are explained. If no rules exist, this requirement should be clarified.  
+Type: Negative
+
+**REG-06 - Password confirmation does not match**  
+Steps / Test data: Enter different values in the password and confirmation fields.  
+Expected result: Registration is blocked and the mismatch is clearly shown.  
+Type: Negative
+
+**REG-07 - Existing email address**  
+Steps / Test data: Register using an email already linked to an account.  
+Expected result: A second account is not created. A clear message explains that the email is already registered.  
+Type: Negative
+
+**REG-08 - Leading and trailing spaces**  
+Steps / Test data: Add spaces before and after the name and email.  
+Expected result: The application handles spaces consistently, preferably trimming harmless spaces or showing a clear validation message.  
+Type: Edge
+
+**REG-09 - Very long registration input**  
+Steps / Test data: Enter values near and above the allowed maximum length.  
+Expected result: Allowed values are accepted. Overly long values are rejected without breaking the page or database.  
+Type: Edge
+
+**REG-10 - Special characters in registration fields**  
+Steps / Test data: Use valid characters in the name and password, including punctuation where allowed.  
+Expected result: Valid characters are handled correctly. Invalid characters are rejected with a clear message.  
+Type: Edge
+
+### Login
+
+**LOG-01 - Login with valid credentials**  
+Steps / Test data: Enter a registered email and correct password.  
+Expected result: Login succeeds and the user can access the task list.  
+Type: Positive
+
+**LOG-02 - Wrong password**  
+Steps / Test data: Enter a registered email with an incorrect password.  
+Expected result: Login fails and a clear, non-sensitive error is shown.  
+Type: Negative
+
+**LOG-03 - Unregistered email**  
+Steps / Test data: Enter an email that has no account.  
+Expected result: Login fails. The message must not expose unnecessary account details.  
+Type: Negative
+
+**LOG-04 - Empty login fields**  
+Steps / Test data: Submit the login form with both fields empty.  
+Expected result: Login is blocked and required-field messages are displayed.  
+Type: Negative
+
+**LOG-05 - Invalid login email format**  
+Steps / Test data: Enter an invalid email format with any password.  
+Expected result: The email is rejected before login is attempted, or a suitable validation message is shown.  
+Type: Negative
+
+**LOG-06 - Email case and spaces**  
+Steps / Test data: Try the registered email with different letter casing and accidental spaces.  
+Expected result: Behavior follows the defined email rules consistently. A valid email should not fail only because of harmless formatting differences unless documented.  
+Type: Edge
+
+**LOG-07 - Multiple failed login attempts**  
+Steps / Test data: Submit several incorrect passwords for the same account.  
+Expected result: The application applies its defined protection, such as rate limiting, temporary lockout, or an appropriate warning. Passwords are not revealed.  
+Type: Security
+
+**LOG-08 - Logout and protected page access**  
+Steps / Test data: Log in, log out, then try to open the task page using the previous URL or browser Back button.  
+Expected result: The user cannot access protected task data and is sent to login.  
+Type: Negative
+
+### Task CRUD
+
+**TASK-01 - Create a valid task**  
+Steps / Test data: Log in and enter valid task data. Submit it.  
+Expected result: The task is created once and appears in the user's task list.  
+Type: Positive
+
+**TASK-02 - Create a task with empty required data**  
+Steps / Test data: Leave required task data empty and submit.  
+Expected result: The task is not created and the missing data is identified.  
+Type: Negative
+
+**TASK-03 - Create a task with very long data**  
+Steps / Test data: Enter task data near and above the allowed length.  
+Expected result: Valid maximum-length data is handled. Excessively long input is rejected safely.  
+Type: Edge
+
+**TASK-04 - Create a task with special characters**  
+Steps / Test data: Use punctuation, line breaks, and other allowed special characters.  
+Expected result: The task is stored and displayed correctly without corrupting the page or being treated as executable content.  
+Type: Edge
+
+**TASK-05 - View tasks after login**  
+Steps / Test data: Log in as a user who has existing tasks.  
+Expected result: The task list loads and shows the correct tasks. Empty-list behavior is also clear for a user with no tasks.  
+Type: Positive
+
+**TASK-06 - Edit an existing task**  
+Steps / Test data: Open a task, change its data, and save.  
+Expected result: The updated task appears in the list with the new values.  
+Type: Positive
+
+**TASK-07 - Edit with empty or invalid data**  
+Steps / Test data: Remove required task data or enter an invalid value, then save.  
+Expected result: The update is blocked and the original task data is not lost.  
+Type: Negative
+
+**TASK-08 - Delete an existing task**  
+Steps / Test data: Delete a task and confirm if a confirmation step exists.  
+Expected result: The selected task is removed and other tasks remain unchanged.  
+Type: Positive
+
+**TASK-09 - Cancel deletion**  
+Steps / Test data: Start deleting a task and cancel the confirmation if available.  
+Expected result: The task remains in the list unchanged.  
+Type: Negative
+
+**TASK-10 - Edit only the selected task**  
+Steps / Test data: Open one task and verify that editing changes only that task.  
+Expected result: No other task is changed.  
+Type: Edge
+
+**TASK-11 - Verify persistence after refresh**  
+Steps / Test data: Create or edit a task, refresh the page, and view the list again.  
+Expected result: The saved change remains visible.  
+Type: Positive
+
+**TASK-12 - Verify persistence after re-login**  
+Steps / Test data: Create or edit a task, log out, and log in again.  
+Expected result: The task and its latest changes are still present.  
+Type: Positive
+
+**TASK-13 - Verify task ownership**  
+Steps / Test data: Create tasks for User A. Log in as User B and view, edit, or delete tasks.  
+Expected result: User B cannot see or change User A's tasks.  
+Type: Security
+
+**TASK-14 - Duplicate task submission**  
+Steps / Test data: Submit the create action repeatedly, including by double-clicking if possible.  
+Expected result: Only the intended number of tasks is created. Accidental duplicate records are avoided or clearly handled.  
+Type: Edge
+
+### Input Validation and Error Handling
+
+**ERR-01 - Server or database failure during create**  
+Steps / Test data: Simulate a test-environment failure while saving a task.  
+Expected result: A clear error is shown. The user is told whether the task was saved, and no misleading success message is displayed.  
+Type: Error handling
+
+**ERR-02 - Server or database failure during edit or delete**  
+Steps / Test data: Simulate a failure while updating or deleting a task.  
+Expected result: The user receives a useful error. Existing data is not incorrectly shown as changed or deleted.  
+Type: Error handling
+
+**ERR-03 - Unexpected technical error**  
+Steps / Test data: Cause or simulate an invalid request or unavailable service.  
+Expected result: The application shows a friendly error without stack traces, SQL statements, file paths, or other sensitive technical information.  
+Type: Error handling
+
+**ERR-04 - Repeated form submission after an error**  
+Steps / Test data: Submit invalid data, correct it, and submit again.  
+Expected result: Old error messages do not remain incorrectly, and the corrected request is processed normally.  
+Type: Edge
 
 ## Potential Bugs and Risk Areas
 
